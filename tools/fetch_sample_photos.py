@@ -36,7 +36,7 @@ for item in CFG["items"]:
             data = api({"action": "query", "generator": "search", "gsrsearch": f"{query} filemime:image/jpeg",
                         "gsrnamespace": "6", "gsrlimit": "10", "prop": "imageinfo",
                         "iiprop": "url|size|mime|extmetadata", "iiurlwidth": str(CFG["thumb_width"]),
-                        "iiextmetadatafilter": "LicenseShortName|Artist|ImageDescription|Credit"})
+                        "iiextmetadatafilter": "LicenseShortName|Artist|ImageDescription|Credit|Categories"})
         except Exception as e:
             print("search failed", query, e); continue
         for p in sorted(data.get("query", {}).get("pages", []), key=lambda p: p.get("index", 0)):
@@ -61,7 +61,8 @@ for item in CFG["items"]:
                            "thumburl": ii.get("thumburl"), "width": ii.get("width"), "height": ii.get("height"),
                            "license": lic, "artist": strip(md.get("Artist", {}).get("value", "")),
                            "credit": strip(md.get("Credit", {}).get("value", "")),
-                           "description": strip(md.get("ImageDescription", {}).get("value", ""))[:200]})
+                           "description": strip(md.get("ImageDescription", {}).get("value", ""))[:200],
+                           "categories": strip(md.get("Categories", {}).get("value", ""))[:300]})
             print(item["key"], n, p["title"], lic)
             time.sleep(0.3)
             if len(picked) >= CFG["per_query"] * 2:

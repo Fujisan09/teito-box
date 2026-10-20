@@ -1,54 +1,122 @@
 {
-  "comment": "お試し版のサンプル品目に付ける参考写真の検索条件。GitHub Actions が Wikimedia Commons（自由ライセンスの写真）から候補を集めて photo-candidates ブランチに置く。",
-  "items": [
-    {
-      "key": "i1",
-      "name": "H形鋼",
-      "queries": [
-        "steel beam stack",
-        "I-beam stack",
-        "steel girders stockpile",
-        "Stahlträger Lager",
-        "structural steel stock",
-        "Doppel-T-Träger"
-      ]
-    },
-    {
-      "key": "i5",
-      "name": "単管パイプ",
-      "queries": [
-        "steel pipe bundle",
-        "Rohrbündel",
-        "Stahlrohre Stapel",
-        "scaffold tube bundle",
-        "pipe stack",
-        "galvanized pipes"
-      ]
-    },
-    {
-      "key": "i9",
-      "name": "鋼製足場板",
-      "queries": [
-        "scaffold plank",
-        "scaffold board",
-        "aluminium scaffold board",
-        "Gerüstbelag",
-        "Gerüstboden",
-        "Belagbohle",
-        "scaffolding walk board",
-        "布板"
-      ]
-    }
-  ],
-  "allowed_licenses": [
-    "CC0",
-    "Public domain",
-    "CC BY",
-    "CC BY-SA",
-    "CC-BY",
-    "CC-BY-SA",
-    "PD"
-  ],
-  "per_query": 6,
-  "thumb_width": 1280
+ "comment": "日本で撮影された自由ライセンス写真（Wikimedia Commons）を優先して候補収集",
+ "items": [
+  {
+   "key": "i1",
+   "name": "H形鋼",
+   "queries": [
+    "H形鋼",
+    "H鋼",
+    "鉄骨 資材 置場",
+    "鉄骨 建方",
+    "incategory:\"Steel frame construction in Japan\"",
+    "H-beam Japan"
+   ]
+  },
+  {
+   "key": "i2",
+   "name": "投光器",
+   "queries": [
+    "投光器",
+    "工事用照明",
+    "夜間工事 照明",
+    "バルーンライト",
+    "incategory:\"Floodlights in Japan\""
+   ]
+  },
+  {
+   "key": "i3",
+   "name": "残土",
+   "queries": [
+    "残土",
+    "盛土 工事",
+    "建設発生土",
+    "土砂 仮置き",
+    "incategory:\"Soil in Japan\""
+   ]
+  },
+  {
+   "key": "i4",
+   "name": "スポットクーラー",
+   "queries": [
+    "スポットクーラー",
+    "スポットエアコン",
+    "移動式エアコン",
+    "Spot cooler Japan"
+   ]
+  },
+  {
+   "key": "i5",
+   "name": "単管パイプ",
+   "queries": [
+    "単管パイプ",
+    "単管",
+    "単管足場",
+    "incategory:\"Scaffolding in Japan\"",
+    "足場 鋼管"
+   ]
+  },
+  {
+   "key": "i6",
+   "name": "カラーコーン",
+   "queries": [
+    "カラーコーン",
+    "パイロン 工事",
+    "incategory:\"Traffic cones in Japan\"",
+    "コーンバー"
+   ]
+  },
+  {
+   "key": "i7",
+   "name": "消火器",
+   "queries": [
+    "粉末消火器",
+    "消火器",
+    "incategory:\"Fire extinguishers in Japan\""
+   ]
+  },
+  {
+   "key": "i8",
+   "name": "コンテナ",
+   "queries": [
+    "20フィートコンテナ",
+    "海上コンテナ",
+    "incategory:\"Intermodal containers in Japan\"",
+    "コンテナ 倉庫"
+   ]
+  },
+  {
+   "key": "i9",
+   "name": "足場板",
+   "queries": [
+    "足場板",
+    "鋼製布板",
+    "くさび緊結式足場",
+    "incategory:\"Scaffolding in Japan\"",
+    "ビケ足場"
+   ]
+  },
+  {
+   "key": "i10",
+   "name": "発電機",
+   "queries": [
+    "発電機",
+    "可搬型発電機",
+    "エンジン発電機",
+    "incategory:\"Engine-generators in Japan\"",
+    "非常用発電機"
+   ]
+  }
+ ],
+ "allowed_licenses": [
+  "CC0",
+  "Public domain",
+  "CC BY",
+  "CC BY-SA",
+  "CC-BY",
+  "CC-BY-SA",
+  "PD"
+ ],
+ "per_query": 6,
+ "thumb_width": 1280
 }
