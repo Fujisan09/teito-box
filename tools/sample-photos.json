@@ -1,18 +1,18 @@
 {
   "comment": "お試し版のサンプル品目に付ける参考写真の検索条件。GitHub Actions が Wikimedia Commons（自由ライセンスの写真）から候補を集めて photo-candidates ブランチに置く。",
   "items": [
-    {"key": "i1",  "name": "H形鋼",            "queries": ["H形鋼", "H-beam steel beams stack", "wide flange steel beam construction"]},
-    {"key": "i2",  "name": "LED投光器",         "queries": ["LED投光器", "LED floodlight work light", "LED flood light construction"]},
-    {"key": "i3",  "name": "残土",              "queries": ["残土", "soil heap excavation construction", "pile of earth construction site"]},
-    {"key": "i4",  "name": "スポットクーラー",   "queries": ["スポットクーラー", "spot cooler portable air conditioner", "portable air conditioner unit"]},
-    {"key": "i5",  "name": "単管パイプ",         "queries": ["単管パイプ", "scaffolding tubes steel pipes bundle", "scaffold pipes stack"]},
-    {"key": "i6",  "name": "カラーコーン",       "queries": ["カラーコーン", "traffic cones stack", "traffic cone red"]},
-    {"key": "i7",  "name": "消火器",            "queries": ["粉末消火器", "ABC fire extinguisher", "fire extinguisher red"]},
-    {"key": "i8",  "name": "コンテナ",           "queries": ["20フィートコンテナ", "20 ft shipping container", "intermodal container storage"]},
-    {"key": "i9",  "name": "鋼製足場板",         "queries": ["足場板", "steel scaffold planks", "scaffolding boards steel"]},
-    {"key": "i10", "name": "発電機",            "queries": ["可搬型発電機", "portable diesel generator construction", "generator set construction site"]}
+    {"key": "i1",  "name": "H形鋼",            "queries": ["incategory:\"Steel beams\"", "incategory:\"I-beams\"", "incategory:\"Wide-flange beams\"", "steel beams stack", "Stahlträger", "H形鋼"]},
+    {"key": "i2",  "name": "LED投光器",         "queries": ["LED投光器", "LED floodlights", "incategory:\"LED floodlights\"", "work light LED"]},
+    {"key": "i3",  "name": "残土",              "queries": ["incategory:\"Soil heaps\"", "soil stockpile", "earth pile", "Erdaushub", "incategory:\"Piles of soil\""]},
+    {"key": "i4",  "name": "スポットクーラー",   "queries": ["スポットクーラー", "incategory:\"Portable air conditioners\"", "spot cooler", "Air conditioners (2778094203)"]},
+    {"key": "i5",  "name": "単管パイプ",         "queries": ["単管パイプ", "scaffold tubes", "Gerüstrohre", "incategory:\"Scaffolding components\"", "steel pipes stack", "incategory:\"Steel pipes\"", "pipe bundle"]},
+    {"key": "i6",  "name": "カラーコーン",       "queries": ["incategory:\"Traffic cones\"", "traffic cones stack", "Leitkegel", "stacked cones", "カラーコーン"]},
+    {"key": "i7",  "name": "消火器",            "queries": ["YamatoProtec YP-10ET", "粉末消火器", "incategory:\"Fire extinguishers in Japan\"", "ABC fire extinguisher"]},
+    {"key": "i8",  "name": "コンテナ",           "queries": ["20 tons dry container leased from Beacon", "incategory:\"Intermodal containers in Japan\"", "20 ft container", "海上コンテナ"]},
+    {"key": "i9",  "name": "鋼製足場板",         "queries": ["incategory:\"Scaffold boards\"", "scaffold boards", "scaffold planks", "Gerüstbohlen", "足場板", "scaffolding deck steel"]},
+    {"key": "i10", "name": "発電機",            "queries": ["incategory:\"Portable generators\"", "incategory:\"Engine-generators\"", "Stromerzeuger", "Notstromaggregat", "portable generator", "mobile generator trailer", "発電機"]}
   ],
   "allowed_licenses": ["CC0", "Public domain", "CC BY", "CC BY-SA", "CC-BY", "CC-BY-SA", "PD"],
-  "per_query": 4,
+  "per_query": 5,
   "thumb_width": 1280
 }
