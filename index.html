@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>TEITO BOX お試し版</title>
+<title>TEITO BOX お試し版 v3</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
 <style>
 [hidden]{display:none!important}img{max-width:100%}
@@ -67,9 +67,10 @@ label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mu
 label.f input,label.f select,label.f textarea{padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font-size:14px;width:100%}
 label.f.mono input{font-family:var(--mono)}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
-.photos{display:flex;gap:8px;flex-wrap:wrap}
-.photos img{width:110px;height:110px;object-fit:cover;border-radius:6px;border:1px solid var(--line);cursor:pointer;max-width:100%}
-.thumb{width:48px;height:48px;object-fit:cover;border-radius:4px;border:1px solid var(--line);vertical-align:middle;display:block}
+/* Photos are never cropped: list thumbs and detail photos keep the whole picture, tap to enlarge. */
+.photos{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start}
+.photos img{height:120px;width:auto;max-width:100%;object-fit:contain;border-radius:6px;border:1px solid var(--line);background:var(--cream);cursor:zoom-in}
+.thumb{width:56px;height:42px;max-width:none;object-fit:contain;border-radius:4px;border:1px solid var(--line);background:var(--cream);vertical-align:middle;display:block}
 .jpmap{width:100%;max-width:720px;height:auto;display:block;background:var(--paper);border:1px solid var(--line);border-radius:8px}
 .jpmap path{fill:var(--cream);stroke:var(--line);stroke-width:.6}
 .jpmap .pin{fill:var(--accent);stroke:#fff;stroke-width:1.2;cursor:pointer}
@@ -88,15 +89,23 @@ label.f.mono input{font-family:var(--mono)}
 .kv{display:grid;grid-template-columns:110px 1fr;gap:4px 10px;font-size:13px}
 .kv div:nth-child(odd){color:var(--mute)}
 .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:8px;z-index:50;font-size:13px;max-width:90%}
+#toasts{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;z-index:50;max-width:90%;pointer-events:none}
+.toast{background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:8px;font-size:13px}
 .gate{max-width:420px;margin:40px auto;display:flex;flex-direction:column;gap:12px}
-.lightbox{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;cursor:zoom-out}
-.lightbox img{max-width:95%;max-height:95%;object-fit:contain}
+.lightbox{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:zoom-out;padding:max(56px,calc(44px + env(safe-area-inset-top,0px))) 12px max(12px,env(safe-area-inset-bottom,0px))}
+.lightbox img{max-width:100%;max-height:100%;min-height:0;flex:0 1 auto;width:auto;height:auto;object-fit:contain;background:#000}
+.lightbox .bar{display:flex;align-items:center;justify-content:center;gap:12px;flex:none;max-width:100%}
+.lightbox .cap{color:#fff;font-size:13px;opacity:.9;text-align:center;flex:0 1 auto}
+.lightbox .x{position:absolute;top:max(10px,env(safe-area-inset-top,0px));right:12px;background:rgba(255,255,255,.18);color:#fff;border:0;border-radius:999px;padding:8px 14px;font-size:14px;cursor:pointer}
+.lightbox .nv{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.18);color:#fff;border:0;border-radius:999px;width:44px;height:44px;font-size:26px;line-height:1;cursor:pointer;flex:none}
+.lightbox .nv.l{left:8px}.lightbox .nv.r{right:8px}
+@media (max-width:700px){.lightbox .nv{position:static;transform:none}} /* phones: arrows beside the caption, not over the photo */
+.lightbox .del{background:transparent;color:#f6a9a3;border:1px solid #f6a9a3;flex:none}
 .note{font-size:12px;color:var(--mute)}
 .confirm{background:var(--warnbg);border:1px solid var(--warn);border-radius:6px;padding:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .hist{display:flex;flex-direction:column;gap:6px}
 .hist div{display:grid;grid-template-columns:90px 60px 1fr;gap:8px;font-size:13px;padding:4px 0;border-bottom:1px dashed var(--line)}
-@media (prefers-reduced-motion:no-preference){.toast{animation:up .2s ease-out}@keyframes up{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}}
+@media (prefers-reduced-motion:no-preference){.toast{animation:up .2s ease-out}@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}}
 @media (max-width:600px){.kv{grid-template-columns:90px 1fr}}
 
 .login{max-width:380px;margin:40px auto;display:flex;flex-direction:column;gap:12px}
@@ -144,24 +153,48 @@ let gateSite=null; // customer view
 let main=$("#main"),overlay=$("#overlay");
 
 /* ---------- persistence ---------- */
-function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2600)}
+function toast(m){let c=$("#toasts");if(!c){c=document.createElement("div");c.id="toasts";document.body.appendChild(c)}const t=document.createElement("div");t.className="toast";t.textContent=m;c.appendChild(t);setTimeout(()=>t.remove(),3200)}
 const DEMO=!(CFG.url&&CFG.key);
+/* Trial-mode photo store. localStorage is capped at ~5MB, so full-size photos live in IndexedDB (hundreds of MB);
+   only the ledger and small thumbnails stay in localStorage. */
+const IDB={_db:null,
+  open(){if(this._db)return Promise.resolve(this._db);return new Promise((res,rej)=>{let r;try{r=indexedDB.open("tb_demo_photos",1)}catch(e){rej(e);return}
+    r.onupgradeneeded=()=>{const s=r.result.createObjectStore("photos",{keyPath:"id"});s.createIndex("itemId","itemId",{unique:false})};
+    r.onsuccess=()=>{this._db=r.result;this._db.onversionchange=()=>{try{this._db.close()}catch(e){}this._db=null};res(this._db)};
+    r.onerror=()=>rej(r.error||new Error("IndexedDB"));r.onblocked=()=>rej(new Error("IndexedDB blocked"))})},
+  async tx(mode,fn){const db=await this.open();return new Promise((res,rej)=>{let t;try{t=db.transaction("photos",mode)}catch(e){rej(e);return}const s=t.objectStore("photos");let out;const q=fn(s);if(q)q.onsuccess=()=>{out=q.result};
+    t.oncomplete=()=>res(out);t.onerror=()=>rej(t.error||new Error("IndexedDB"));t.onabort=()=>rej(t.error||new Error("IndexedDB"))})},
+  put(p){return this.tx("readwrite",s=>s.put(p))},
+  get(id){return this.tx("readonly",s=>s.get(id))},
+  del(id){return this.tx("readwrite",s=>s.delete(id))},
+  all(){return this.tx("readonly",s=>s.getAll())},
+  count(){return this.tx("readonly",s=>s.count())},
+  delByItem(itemId){return this.tx("readwrite",s=>{const req=s.index("itemId").openCursor(IDBKeyRange.only(itemId));req.onsuccess=()=>{const c=req.result;if(c){c.delete();c.continue()}};return null})}
+};
+async function migratePhotos(){ // photos saved by v2 into localStorage → IndexedDB (one-time, keeps the ledger small)
+  if(!DEMO)return;const d=demoStore();if(!d.photos||!d.photos.length)return;
+  try{for(const p of d.photos)await IDB.put({id:p.id,itemId:p.itemId,b64:p.b64});d.photos=[];demoSave(d)}catch(e){}
+}
 function demoStore(){let d=null;try{d=JSON.parse(localStorage.getItem("tb_demo_v2")||"null")}catch(e){}if(!d){d={settings:{company:"帝都運輸機工株式会社",warehouse:"第1倉庫（お試し）",address:"",tel:"",rate:200,billing:"daily",minMonth:1},auth:"teito2026",sites:[{"id":"s1","code":"S-001","pin":"1234","contractor":"大和建設㈱","site":"（仮称）北千住駅前複合ビル新築工事","manager":"山田 太郎","address":"東京都足立区","contact":"田中","tel":"","note":"サンプル現場","mapX":312,"mapY":270,"createdAt":""},{"id":"s2","code":"S-002","pin":"2345","contractor":"東都建設㈱","site":"横浜みなとみらい21 オフィス棟新築工事","manager":"佐藤 健一","address":"神奈川県横浜市","contact":"鈴木","tel":"","note":"サンプル現場","mapX":305,"mapY":283,"createdAt":""},{"id":"s3","code":"S-003","pin":"3456","contractor":"三和工務店㈱","site":"幕張ロジスティクスセンター建設工事","manager":"高橋 誠","address":"千葉県千葉市","contact":"渡辺","tel":"","note":"サンプル現場","mapX":325,"mapY":278,"createdAt":""},{"id":"s4","code":"S-004","pin":"4567","contractor":"北関東建設㈱","site":"さいたま新都心 病院棟増築工事","manager":"伊藤 浩","address":"埼玉県さいたま市","contact":"中村","tel":"","note":"サンプル現場","mapX":306,"mapY":258,"createdAt":""},{"id":"s5","code":"S-005","pin":"5678","contractor":"中部総合建設㈱","site":"名古屋港物流倉庫新築工事","manager":"小林 大輔","address":"愛知県名古屋市","contact":"加藤","tel":"","note":"サンプル現場","mapX":268,"mapY":278,"createdAt":""},{"id":"s6","code":"S-006","pin":"6789","contractor":"関西建設工業㈱","site":"大阪梅田 タワーマンション新築工事","manager":"吉田 修","address":"大阪府大阪市","contact":"山本","tel":"","note":"サンプル現場","mapX":232,"mapY":282,"createdAt":""},{"id":"s7","code":"S-007","pin":"7890","contractor":"東北土木建設㈱","site":"仙台港背後地 道路改良工事","manager":"松本 剛","address":"宮城県仙台市","contact":"井上","tel":"","note":"サンプル現場","mapX":340,"mapY":195,"createdAt":""},{"id":"s8","code":"S-008","pin":"8901","contractor":"九州建設㈱","site":"福岡天神 商業施設建替工事","manager":"木村 拓","address":"福岡県福岡市","contact":"林","tel":"","note":"サンプル現場","mapX":140,"mapY":310,"createdAt":""},{"id":"s9","code":"S-009","pin":"9012","contractor":"北海道建設㈱","site":"札幌駅北口 ホテル新築工事","manager":"斎藤 隆","address":"北海道札幌市","contact":"清水","tel":"","note":"サンプル現場","mapX":374,"mapY":60,"createdAt":""},{"id":"s10","code":"S-010","pin":"0123","contractor":"兵庫総建㈱","site":"神戸ポートアイランド 研究棟新築工事","manager":"山口 和也","address":"兵庫県神戸市","contact":"森","tel":"","note":"サンプル現場","mapX":219,"mapY":274,"createdAt":""}],items:[{"id":"i1","no":"A-00001","siteId":"s1","name":"H形鋼 300×300 L=3m","qty":24,"qtyIn":24,"unit":"本","area":9.0,"location":"A-1","manager":"山田 太郎","person":"田中","inDate":"2026-09-22","outDate":null,"status":"stored","photos":[],"note":"お試しデータ","createdAt":""},{"id":"i2","no":"A-00002","siteId":"s2","name":"LED投光器 200W","qty":12,"qtyIn":12,"unit":"台","area":2.0,"location":"B-2","manager":"佐藤 健一","person":"鈴木","inDate":"2026-10-03","outDate":null,"status":"stored","photos":[],"note":"お試しデータ","createdAt":""},{"id":"i3","no":"A-00003","siteId":"s3","name":"残土（良質土）","qty":15,"qtyIn":15,"unit":"㎥","area":20.0,"location":"屋外-1","manager":"高橋 誠","person":"渡辺","inDate":"2026-09-15","outDate":null,"status":"stored","photos":[],"note":"お試しデータ","createdAt":""},{"id":"i4","no":"A-00004","siteId":"s4","name":"スポットクーラー（単相100V）","qty":0,"qtyIn":6,"unit":"台","area":3.0,"location":"B-4","manager":"伊藤 浩","person":"中村","inDate":"2026-08-28","outDate":"2026-10-05","status":"out","photos":[],"note":"お試しデータ","createdAt":""},{"id":"i5","no":"A-00005","siteId":"s5","name":"仮設単管パイプ 4m","qty":300,"qtyIn":300,"unit":"本","area":6.0,"location":"A-5","manager":"小林 大輔","person":"加藤","inDate":"2026-09-30","outDate":null,"status":"stored","photos":[],"note":"お試しデータ","createdAt":""},{"id":"i6","no":"A-00006","siteId":"s6","name":"カラーコーン（赤・重り付）","qty":80,"qtyIn":80,"unit":"個","area":4.0,"location":"C-1","manager":"吉田 修","person":"山本","inDate":"2026-10-06","outDate":null,"status":"stored","photos":[],"note":"お試しデータ","createdAt":""},{"id":"i7","no":"A-00007","siteId":"s7","name":"ABC粉末消火器 10型","qty":20,"qtyIn":20,"unit":"本","area":1.0,"location":"C-3","manager":"松本 剛","person":"井上","inDate":"2026-09-08","outDate":null,"status":"stored","photos":[],"note":"お試しデータ","createdAt":""},{"id":"i8","no":"A-00008","siteId":"s8","name":"仮設倉庫（コンテナ 20ft）","qty":1,"qtyIn":1,"unit":"棟","area":15.0,"location":"屋外-2","manager":"木村 拓","person":"林","inDate":"2026-07-20","outDate":null,"status":"stored","photos":[],"note":"お試しデータ","createdAt":""},{"id":"i9","no":"A-00009","siteId":"s9","name":"鋼製足場板 4m","qty":150,"qtyIn":150,"unit":"枚","area":8.0,"location":"A-3","manager":"斎藤 隆","person":"清水","inDate":"2026-10-10","outDate":null,"status":"stored","photos":[],"note":"お試しデータ","createdAt":""},{"id":"i10","no":"A-00010","siteId":"s10","name":"仮設発電機 25kVA","qty":0,"qtyIn":2,"unit":"台","area":3.0,"location":"B-6","manager":"山口 和也","person":"森","inDate":"2026-09-01","outDate":"2026-10-12","status":"out","photos":[],"note":"お試しデータ","createdAt":""}],moves:[{"id":"m1","itemId":"i1","no":"A-00001","siteId":"s1","type":"in","qty":24,"date":"2026-09-22","memo":"受入"},{"id":"m2","itemId":"i2","no":"A-00002","siteId":"s2","type":"in","qty":12,"date":"2026-10-03","memo":"受入"},{"id":"m3","itemId":"i3","no":"A-00003","siteId":"s3","type":"in","qty":15,"date":"2026-09-15","memo":"受入"},{"id":"m4","itemId":"i4","no":"A-00004","siteId":"s4","type":"in","qty":6,"date":"2026-08-28","memo":"受入"},{"id":"m5","itemId":"i4","no":"A-00004","siteId":"s4","type":"out","qty":6,"date":"2026-10-05","memo":"現場 中村 引取"},{"id":"m6","itemId":"i5","no":"A-00005","siteId":"s5","type":"in","qty":300,"date":"2026-09-30","memo":"受入"},{"id":"m7","itemId":"i6","no":"A-00006","siteId":"s6","type":"in","qty":80,"date":"2026-10-06","memo":"受入"},{"id":"m8","itemId":"i7","no":"A-00007","siteId":"s7","type":"in","qty":20,"date":"2026-09-08","memo":"受入"},{"id":"m9","itemId":"i8","no":"A-00008","siteId":"s8","type":"in","qty":1,"date":"2026-07-20","memo":"受入"},{"id":"m10","itemId":"i9","no":"A-00009","siteId":"s9","type":"in","qty":150,"date":"2026-10-10","memo":"受入"},{"id":"m11","itemId":"i10","no":"A-00010","siteId":"s10","type":"in","qty":2,"date":"2026-09-01","memo":"受入"},{"id":"m12","itemId":"i10","no":"A-00010","siteId":"s10","type":"out","qty":2,"date":"2026-10-12","memo":"現場 森 引取"}],photos:[]}}return d}
-function demoSave(d){try{localStorage.setItem("tb_demo_v2",JSON.stringify(d))}catch(e){toast("保存容量を超えました（お試し版は写真を少なめにしてください）")}}
+function demoSave(d){try{localStorage.setItem("tb_demo_v2",JSON.stringify(d))}catch(e){throw new Error("この端末の保存容量がいっぱいです（お試し版の上限）")}}
 async function localRpc(action,payload){payload=payload||{};const d=demoStore();const ok=PW!==null&&PW===d.auth;const E=m=>{throw new Error(m)};
   if(action==="site_view"){const s=d.sites.find(x=>x.code===payload.code&&x.pin===payload.pin);if(!s)E("現場コードまたは暗証番号が違います");return {settings:d.settings,site:s,items:d.items.filter(i=>i.siteId===s.id),moves:d.moves.filter(m=>m.siteId===s.id)}}
-  if(action==="photo"){const p=d.photos.find(x=>x.id===payload.id);if(!p)E("not found");return p}
+  if(action==="photo"){let p=null;try{p=await IDB.get(payload.id)}catch(e){}if(!p)p=(d.photos||[]).find(x=>x.id===payload.id);if(!p)E("not found");return p}
   if(!ok)E("auth");
   if(action==="login")return {ok:true};
   if(action==="all")return {settings:d.settings,sites:d.sites,items:d.items,moves:d.moves};
-  if(action==="set"){const c=payload.col;if(c==="settings")d.settings=payload.data;else{const arr=d[c]||(d[c]=[]);const i=arr.findIndex(x=>x.id===payload.id);if(i>=0)arr[i]=payload.data;else arr.push(payload.data)}demoSave(d);return {ok:true}}
-  if(action==="del"){const c=payload.col;d[c]=(d[c]||[]).filter(x=>x.id!==payload.id);if(c==="items"){d.moves=d.moves.filter(m=>m.itemId!==payload.id);d.photos=d.photos.filter(m=>m.itemId!==payload.id)}demoSave(d);return {ok:true}}
+  if(action==="set"){const c=payload.col;
+    if(c==="photos"){const rec={id:payload.id,itemId:payload.data.itemId,b64:payload.data.b64};try{await IDB.put(rec)}catch(e){(d.photos||(d.photos=[])).push(rec);demoSave(d)}return {ok:true}}
+    if(c==="settings")d.settings=payload.data;else{const arr=d[c]||(d[c]=[]);const i=arr.findIndex(x=>x.id===payload.id);if(i>=0)arr[i]=payload.data;else arr.push(payload.data)}demoSave(d);return {ok:true}}
+  if(action==="del"){const c=payload.col;
+    if(c==="photos"){try{await IDB.del(payload.id)}catch(e){}if(d.photos&&d.photos.some(x=>x.id===payload.id)){d.photos=d.photos.filter(x=>x.id!==payload.id);demoSave(d)}return {ok:true}}
+    d[c]=(d[c]||[]).filter(x=>x.id!==payload.id);if(c==="items"){d.moves=d.moves.filter(m=>m.itemId!==payload.id);d.photos=(d.photos||[]).filter(m=>m.itemId!==payload.id);try{await IDB.delByItem(payload.id)}catch(e){}}demoSave(d);return {ok:true}}
   if(action==="set_password"){d.auth=payload.new;demoSave(d);return {ok:true}}
-  if(action==="backup")return d;
+  if(action==="backup"){let ph=[];try{ph=await IDB.all()}catch(e){}return {...d,photos:(d.photos||[]).concat(ph)}}
   E("unknown action")}
 async function rpc(action,payload){if(DEMO)return localRpc(action,payload);const r=await fetch(CFG.url.replace(/\/$/,"")+"/rest/v1/rpc/tb",{method:"POST",headers:{"Content-Type":"application/json",apikey:CFG.key,Authorization:"Bearer "+CFG.key},body:JSON.stringify({action,pw:PW,payload:payload||{}})});if(!r.ok)throw new Error("HTTP "+r.status);const j=await r.json();if(j&&j.error)throw new Error(j.error);return j}
 async function reload(){const d=await rpc("all");S.settings={...S.settings,...(d.settings||{})};S.sites=d.sites||[];S.items=d.items||[];S.moves=d.moves||[];if(!(tab==="in"&&canWrite))render()}
-async function save(path,data){const [col,id]=path.split("/");try{await rpc("set",{col,id,data});const i=S[col]?S[col].findIndex(x=>x.id===id):-1;if(col==="settings")S.settings={...S.settings,...data};else if(i>=0)S[col][i]=data;else if(S[col])S[col].push(data);if(!(tab==="in"&&canWrite))render()}catch(e){if(e.message==="auth"){PW=null;sessionStorage.removeItem("tb_pw");render();toast("ログインし直してください")}else toast("保存に失敗しました: "+e.message);throw e}}
+async function save(path,data){const [col,id]=path.split("/");try{await rpc("set",{col,id,data});const i=Array.isArray(S[col])?S[col].findIndex(x=>x.id===id):-1;if(col==="settings")S.settings={...S.settings,...data};else if(i>=0)S[col][i]=data;else if(Array.isArray(S[col]))S[col].push(data);if(!(tab==="in"&&canWrite))render()}catch(e){if(e.message==="auth"){PW=null;sessionStorage.removeItem("tb_pw");render();toast("ログインし直してください")}else toast("保存に失敗しました: "+e.message);throw e}}
 async function del(path){const [col,id]=path.split("/");try{await rpc("del",{col,id});if(S[col])S[col]=S[col].filter(x=>x.id!==id);if(col==="items")S.moves=S.moves.filter(m=>m.itemId!==id);render()}catch(e){toast("削除に失敗しました");throw e}}
 function nextNo(){let max=0;S.items.forEach(i=>{const m=/^A-(\d+)$/.exec(i.no||"");if(m)max=Math.max(max,+m[1])});return "A-"+String(max+1).padStart(5,"0")}
 function siteOf(id){return S.sites.find(s=>s.id===id)}
@@ -184,7 +217,7 @@ function totalFee(it){ // whole stay
 
 /* ---------- render ---------- */
 function render(){
-  $("#whSub").textContent=DEMO?"お試し版（データはこの端末の中だけに保存されます）":(S.settings.company||"帝都運輸機工")+(S.settings.warehouse?"  "+S.settings.warehouse:"")+"  預かり品 保管管理";
+  $("#whSub").textContent=DEMO?"お試し版 v3（データはこの端末の中だけに保存されます）":(S.settings.company||"帝都運輸機工")+(S.settings.warehouse?"  "+S.settings.warehouse:"")+"  預かり品 保管管理";
   const badge=$("#modeBadge");
   if(canWrite){badge.textContent="管理者";$("#tabs").hidden=false;renderAdmin()}
   else{badge.textContent=gateSite?("現場: "+gateSite.site):"現場閲覧";$("#tabs").hidden=true;renderCustomer()}
@@ -253,23 +286,44 @@ function vIn(){
   </div>`;
   let pending=[];
   const fillMgr=()=>{const s=siteOf($("#f_site").value);if(s&&s.manager&&!$("#f_manager").value)$("#f_manager").value=s.manager};fillMgr();$("#f_site").onchange=()=>{$("#f_manager").value="";fillMgr()};
-  $("#f_photo").onchange=async e=>{const files=[...e.target.files];$("#f_msg").textContent="写真を縮小中…";for(const f of files){try{const b=await shrink(f);pending.push(b);$("#f_prev").insertAdjacentHTML("beforeend",`<img src="${b.thumb}" alt="">`)}catch(err){toast("写真の読み込みに失敗")}}$("#f_msg").textContent=pending.length+"枚 添付";e.target.value=""};
+  const drawPrev=()=>{$("#f_prev").innerHTML=pending.map((b,i)=>`<img src="${b.thumb}" alt="添付写真 ${i+1}" data-i="${i}">`).join("");$("#f_prev").querySelectorAll("img").forEach(im=>im.onclick=()=>showPhotos({no:no,name:"添付する写真（タップで拡大・削除できます）",photos:pending.map((b,i)=>({id:"pending"+i,thumb:b.thumb,_full:b.full}))},+im.dataset.i,{onDelete:p=>{pending.splice(+p.id.slice(7),1);drawPrev();$("#f_msg").textContent=pending.length+"枚 添付"}}));$("#f_msg").textContent=pending.length?pending.length+"枚 添付（タップで拡大）":""};
+  $("#f_photo").onchange=async e=>{const files=[...e.target.files];$("#f_msg").textContent="写真を縮小中…";for(const f of files){try{pending.push(await shrink(f))}catch(err){toast("写真の読み込みに失敗しました: "+(f.name||""))}}drawPrev();e.target.value=""};
   $("#f_save").onclick=async()=>{
     const name=$("#f_name").value.trim();if(!name){toast("品名を入力してください");$("#f_name").focus();return}const manager=$("#f_manager").value.trim();if(!manager){toast("所長名は必須です");$("#f_manager").focus();return}
     const btn=$("#f_save");btn.disabled=true;$("#f_msg").textContent="保存中…";
     const id="i"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-    const ids=[];for(const b of pending){try{ids.push(await uploadPhoto(id,b))}catch(err){toast("写真のアップロードに失敗")}}
+    const ids=[];for(const b of pending){try{ids.push(await uploadPhoto(id,b))}catch(err){toast("写真を保存できませんでした: "+err.message)}}
     const qty=+$("#f_qty").value||0;
     const it={id,no,siteId:$("#f_site").value,name,qty,qtyIn:qty,unit:$("#f_unit").value||"個",area:+$("#f_area").value||0,location:$("#f_loc").value.trim(),manager,person:$("#f_person").value.trim(),inDate:$("#f_in").value||today(),outDate:null,status:"stored",photos:ids,note:$("#f_note").value.trim(),createdAt:new Date().toISOString()};
     try{await save("items/"+id,it);await addMove(it,"in",qty,it.inDate,"受入");toast(no+" を登録しました");tab="stock";renderAdmin();openItem(id)}catch(e){btn.disabled=false;$("#f_msg").textContent=""}
   };
 }
 async function addMove(it,type,qty,date,memo){const mid="m"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);await save("moves/"+mid,{id:mid,itemId:it.id,no:it.no,siteId:it.siteId,type,qty,date,memo:memo||"",createdAt:new Date().toISOString()})}
-function shrink(file){return new Promise((res,rej)=>{const img=new Image();const u=URL.createObjectURL(file);img.onload=()=>{const mk=(max,q)=>{let w=img.width,h=img.height;const r=Math.min(1,max/Math.max(w,h));w=Math.round(w*r);h=Math.round(h*r);const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);return c.toDataURL("image/jpeg",q)};res({full:mk(1024,.75),thumb:mk(160,.6)});URL.revokeObjectURL(u)};img.onerror=rej;img.src=u})}
-async function uploadPhoto(itemId,p){const id="p"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);await rpc("set",{col:"photos",id,data:{id,itemId,b64:p.full}});return {id,thumb:p.thumb}}
+function shrink(file){return new Promise((res,rej)=>{const img=new Image();const u=URL.createObjectURL(file);img.onload=()=>{try{const mk=(max,q)=>{let w=img.naturalWidth||img.width,h=img.naturalHeight||img.height;const r=Math.min(1,max/Math.max(w,h));w=Math.max(1,Math.round(w*r));h=Math.max(1,Math.round(h*r));const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);return c.toDataURL("image/jpeg",q)};res({full:mk(1280,.78),thumb:mk(240,.68)})}catch(e){rej(e)}URL.revokeObjectURL(u)};img.onerror=()=>{URL.revokeObjectURL(u);rej(new Error("画像を開けません"))};img.src=u})}
+async function uploadPhoto(itemId,p){const id="p"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);await rpc("set",{col:"photos",id,data:{id,itemId,b64:p.full}});photoCache[id]=p.full;return {id,thumb:p.thumb}}
 const photoCache={};
 async function fullPhoto(id){if(photoCache[id])return photoCache[id];const r=await rpc("photo",{id,code:gateSite&&gateSite.code,pin:gateSite&&gateSite.pin});photoCache[id]=r.b64;return r.b64}
 function thumbSrc(p){return typeof p==="string"?"":p.thumb}
+async function delPhoto(it,p){const photos=(it.photos||[]).filter(x=>x.id!==p.id);await save("items/"+it.id,{...it,photos});try{await rpc("del",{col:"photos",id:p.id})}catch(e){}delete photoCache[p.id]}
+/* Enlarged view: whole photo, prev/next (buttons, swipe, arrow keys), close, optional delete */
+function showPhotos(it,idx,opt={}){
+  const ps=it.photos||[];if(!ps.length)return;let i=Math.max(0,Math.min(idx||0,ps.length-1));
+  const l=document.createElement("div");l.className="lightbox";l.setAttribute("role","dialog");
+  l.innerHTML=`<button class="x" type="button">✕ 閉じる</button><img alt="預かり品写真"><div class="bar">${ps.length>1?`<button class="nv l" type="button" aria-label="前の写真">‹</button>`:""}<div class="cap"></div>${ps.length>1?`<button class="nv r" type="button" aria-label="次の写真">›</button>`:""}</div>${opt.onDelete?`<button class="btn sm del" type="button">この写真を削除</button>`:""}`;
+  document.body.appendChild(l);
+  const img=l.querySelector("img"),cap=l.querySelector(".cap"),dl=l.querySelector(".del");let seq=0;
+  const show=async()=>{const p=ps[i];const my=++seq;img.src=thumbSrc(p)||"";cap.textContent=(ps.length>1?`${i+1} / ${ps.length}　`:"")+(it.no||"")+" "+(it.name||"");if(dl){dl.dataset.arm="";dl.textContent="この写真を削除"}
+    try{const full=p._full||await fullPhoto(p.id);if(my===seq)img.src=full}catch(e){if(my===seq)cap.textContent+="　※元の写真が保存されていません（縮小版のみ表示）"}};
+  const close=()=>{l.remove();document.removeEventListener("keydown",key)};
+  const prev=()=>{i=(i-1+ps.length)%ps.length;show()},next=()=>{i=(i+1)%ps.length;show()};
+  const key=e=>{if(e.key==="Escape")close();else if(e.key==="ArrowLeft"&&ps.length>1)prev();else if(e.key==="ArrowRight"&&ps.length>1)next()};
+  l.onclick=e=>{if(e.target===l||e.target===img||e.target===cap)close()};
+  l.querySelector(".x").onclick=e=>{e.stopPropagation();close()};
+  if(ps.length>1){l.querySelector(".nv.l").onclick=e=>{e.stopPropagation();prev()};l.querySelector(".nv.r").onclick=e=>{e.stopPropagation();next()}}
+  if(dl)dl.onclick=async e=>{e.stopPropagation();if(dl.dataset.arm!=="1"){dl.dataset.arm="1";dl.textContent="もう一度押すと削除します";return}dl.disabled=true;try{await opt.onDelete(ps[i]);close()}catch(err){dl.disabled=false;toast("削除に失敗しました: "+err.message)}};
+  let sx=null;l.addEventListener("touchstart",e=>{sx=e.touches[0].clientX},{passive:true});l.addEventListener("touchend",e=>{if(sx==null||ps.length<2)return;const dx=e.changedTouches[0].clientX-sx;sx=null;if(dx>40)prev();else if(dx<-40)next()});
+  document.addEventListener("keydown",key);show();
+}
 
 function vMoves(){
   const list=[...S.moves].sort((a,b)=>(b.date||"").localeCompare(a.date||"")||(b.createdAt||"").localeCompare(a.createdAt||""));
@@ -375,7 +429,8 @@ function openItem(id){
   const it=S.items.find(i=>i.id===id);if(!it)return;const s=siteOf(it.siteId)||{};const admin=isOwner||canWrite;
   const hist=S.moves.filter(m=>m.itemId===id).sort((a,b)=>(a.date||"").localeCompare(b.date||"")||(a.createdAt||"").localeCompare(b.createdAt||""));
   sheet(`<div class="row head"><h2 class="mono">${esc(it.no)}</h2>${statusPill(it)}<button class="btn sm" id="close" style="margin-left:auto">閉じる</button></div>
-  <div class="photos" id="ph">${(it.photos||[]).map(p=>`<img src="${thumbSrc(p)}" alt="預かり品写真" data-full="${p.id}">`).join("")||`<span class="note">写真なし</span>`}</div>
+  <div class="photos" id="ph">${(it.photos||[]).map((p,i)=>`<img src="${thumbSrc(p)}" alt="預かり品写真 ${i+1}" data-i="${i}">`).join("")||`<span class="note">写真なし</span>`}</div>
+  ${(it.photos||[]).length?`<div class="note">写真をタップすると全体を拡大表示します${admin?"（拡大画面から削除もできます）":""}</div>`:""}
   ${admin&&assets?`<label class="f">写真を追加 <input type="file" id="addPhoto" accept="image/*" multiple></label>`:""}
   <div class="kv">
     <div>ゼネコン</div><div>${esc(s.contractor||"（未設定）")}</div>
@@ -396,10 +451,10 @@ function openItem(id){
   <div class="row"><button class="btn" id="slipIn">預かり証を保存</button>${it.status==="out"?`<button class="btn" id="slipOut">出庫伝票を保存</button>`:""}</div>
   ${admin&&it.status!=="out"?`<h3>出庫処理</h3><div class="row"><label class="f">出庫数量 <input type="number" id="o_qty" value="${it.qty}" min="1" max="${it.qty}"></label><label class="f">出庫日 <input type="date" id="o_date" value="${today()}"></label><label class="f grow">引取者・メモ <input id="o_memo" placeholder="例: 現場 田中 引取"></label><button class="btn primary" id="o_go">出庫する</button></div>`:""}
   ${admin?`<h3>編集</h3><div class="grid"><label class="f">品名 <input id="e_name" value="${esc(it.name)}"></label><label class="f">現場 ${sitePicker("e_site",it.siteId).replace("すべての現場","（現場未設定）")}</label><label class="f">保管面積㎡ <input type="number" step="0.1" id="e_area" value="${it.area}"></label><label class="f">棚番 <input id="e_loc" value="${esc(it.location||"")}"></label><label class="f">受入日 <input type="date" id="e_in" value="${it.inDate}"></label><label class="f">所長名（必須） <input id="e_manager" value="${esc(it.manager||s.manager||"")}"></label><label class="f">預け主 <input id="e_person" value="${esc(it.person||"")}"></label></div><label class="f">備考 <textarea id="e_note" rows="2">${esc(it.note||"")}</textarea></label><div class="row"><button class="btn" id="e_save">変更を保存</button><button class="btn danger" id="e_del">この記録を削除</button></div><div id="e_conf"></div>`:""}`);
-  $("#ph").querySelectorAll("img").forEach(im=>im.onclick=async()=>{const l=document.createElement("div");l.className="lightbox";l.innerHTML=`<img src="${im.src}" alt="">`;l.onclick=()=>l.remove();document.body.appendChild(l);try{l.querySelector("img").src=await fullPhoto(im.dataset.full)}catch(e){}});
+  $("#ph").querySelectorAll("img").forEach(im=>im.onclick=()=>showPhotos(it,+im.dataset.i,admin?{onDelete:async p=>{await delPhoto(it,p);toast("写真を削除しました");openItem(id)}}:{}));
   $("#slipIn").onclick=()=>downloadText(`預かり証_${it.no}.html`,slipHTML(it,"in"));
   if($("#slipOut"))$("#slipOut").onclick=()=>downloadText(`出庫伝票_${it.no}.html`,slipHTML(it,"out"));
-  if($("#addPhoto"))$("#addPhoto").onchange=async e=>{const files=[...e.target.files];const ids=[...(it.photos||[])];toast("アップロード中…");for(const f of files){try{ids.push(await uploadPhoto(id,await shrink(f)))}catch(err){toast("アップロード失敗")}}await save("items/"+id,{...it,photos:ids});toast("写真を追加しました");openItem(id)};
+  if($("#addPhoto"))$("#addPhoto").onchange=async e=>{const files=[...e.target.files];const ids=[...(it.photos||[])];let n=0;toast("写真を保存中…");for(const f of files){try{ids.push(await uploadPhoto(id,await shrink(f)));n++}catch(err){toast("写真を保存できませんでした: "+err.message)}}if(n){await save("items/"+id,{...it,photos:ids});toast(n+"枚の写真を追加しました")}openItem(id)};
   if($("#o_go"))$("#o_go").onclick=async()=>{const qn=+$("#o_qty").value||0;if(qn<1||qn>it.qty){toast("出庫数量が不正です");return}const d=$("#o_date").value||today();const rem=it.qty-qn;const upd={...it,qty:rem};if(rem===0){upd.status="out";upd.outDate=d}await save("items/"+id,upd);await addMove(it,"out",qn,d,$("#o_memo").value.trim());toast(rem===0?"全数出庫しました":"一部出庫しました（残 "+rem+"）");openItem(id)};
   if($("#e_save"))$("#e_save").onclick=async()=>{if(!$("#e_manager").value.trim()){toast("所長名は必須です");return}await save("items/"+id,{...it,manager:$("#e_manager").value.trim(),name:$("#e_name").value.trim()||it.name,siteId:$("#e_site").value,area:+$("#e_area").value||0,location:$("#e_loc").value.trim(),inDate:$("#e_in").value||it.inDate,person:$("#e_person").value.trim(),note:$("#e_note").value.trim()});toast("保存しました");openItem(id)};
   if($("#e_del"))$("#e_del").onclick=()=>{$("#e_conf").innerHTML=`<div class="confirm">この預かり品の記録と履歴を削除しますか？元に戻せません。<button class="btn sm danger" id="e_yes">削除する</button></div>`;$("#e_yes").onclick=async()=>{for(const m of S.moves.filter(m=>m.itemId===id))await del("moves/"+m.id);await del("items/"+id);toast("削除しました");closeSheet()}};
@@ -413,7 +468,7 @@ function renderCustomer(){
   if(!gateSite){
     main.innerHTML=`<div class="gate card"><h2>現場担当者ログイン</h2><p class="note">TEITO BOX（帝都運輸機工）から案内された「現場コード」と「暗証番号」を入力すると、お預かりしている品の現状を確認できます。</p>
     <label class="f mono">現場コード <input id="g_code" autocomplete="off"></label><label class="f mono">暗証番号 <input id="g_pin" type="password"></label>
-    <button class="btn primary" id="g_go">確認する</button><div class="note" id="g_msg"></div>${DEMO?`<div class="confirm">お試し版 v2（サンプル10現場・10品目）です。現場コード <b class="mono">S-001</b>／暗証番号 <b class="mono">1234</b> で現場側の画面、「管理者ログイン」→ パスワード <b class="mono">teito2026</b> で倉庫側の画面を試せます。</div>`:""}<div class="note" style="margin-top:12px"><a href="#admin" id="toAdmin">管理者ログイン</a></div>
+    <button class="btn primary" id="g_go">確認する</button><div class="note" id="g_msg"></div>${DEMO?`<div class="confirm">お試し版 v3（サンプル10現場・10品目）です。現場コード <b class="mono">S-001</b>／暗証番号 <b class="mono">1234</b> で現場側の画面、「管理者ログイン」→ パスワード <b class="mono">teito2026</b> で倉庫側の画面を試せます。</div>`:""}<div class="note" style="margin-top:12px"><a href="#admin" id="toAdmin">管理者ログイン</a></div>
     <div class="note">${S.settings.company?esc(S.settings.company)+" ":""}${S.settings.tel?"TEL "+esc(S.settings.tel):""}</div></div>`;
     const go=async()=>{const c=$("#g_code").value.trim(),p=$("#g_pin").value.trim();$("#g_msg").textContent="確認中…";try{const d=await rpc("site_view",{code:c,pin:p});S.settings={...S.settings,...d.settings};S.sites=[d.site];S.items=d.items;S.moves=d.moves;gateSite=d.site;try{localStorage.setItem("teitobox_gate",JSON.stringify({c,p}))}catch(e){}render()}catch(e){$("#g_msg").textContent=e.message==="auth"||/違います/.test(e.message)?"現場コードまたは暗証番号が違います。倉庫にご確認ください。":"接続できません: "+e.message}};
     $("#g_go").onclick=go;$("#g_pin").onkeydown=e=>{if(e.key==="Enter")go()};$("#toAdmin").onclick=e=>{e.preventDefault();renderAdminLogin()};
@@ -431,15 +486,18 @@ function renderCustomer(){
 
 /* ---------- sheets, downloads, documents ---------- */
 function sheet(html){overlay.innerHTML=`<div class="sheet" id="sheetBg"><div class="panel">${html}</div></div>`;$("#close").onclick=closeSheet;$("#sheetBg").onclick=e=>{if(e.target.id==="sheetBg")closeSheet()};document.addEventListener("keydown",escClose)}
-function escClose(e){if(e.key==="Escape")closeSheet()}
+function escClose(e){if(e.key==="Escape"&&!$(".lightbox"))closeSheet()}
 function closeSheet(){overlay.innerHTML="";document.removeEventListener("keydown",escClose)}
 function csv(rows){return "﻿"+rows.map(r=>r.map(v=>{v=String(v??"");return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}).join(",")).join("\r\n")}
-function downloadText(name,text){if(/\.html$/.test(name)){let w=null;try{w=window.open("","_blank")}catch(e){}if(w&&w.document){w.document.open();w.document.write(text);w.document.close();setTimeout(()=>{try{w.focus();w.print()}catch(e){}},600);return}
-  overlay.innerHTML=`<div class="sheet" id="sheetBg"><div class="panel" style="width:min(820px,100%);padding:0"><div class="row head" style="padding:10px 14px"><b>${esc(name.replace(/\.html$/,""))}</b><span class="note">印刷は Ctrl+P（⌘P）</span><button class="btn sm" id="close" style="margin-left:auto">閉じる</button></div><iframe id="slipFrame" style="flex:1;border:0;width:100%;min-height:80vh;background:#fff"></iframe></div></div>`;$("#close").onclick=closeSheet;$("#slipFrame").srcdoc=text;return}const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type:"text/plain;charset=utf-8"}));a.download=name;document.body.appendChild(a);a.click();a.remove()}
+function downloadText(name,text){if(/\.html$/.test(name)){let w=null;try{w=window.open("","_blank")}catch(e){} // open the window synchronously (popup blockers), fill it once the HTML (photos included) is ready
+  const showIn=html=>{if(w&&w.document){w.document.open();w.document.write(html);w.document.close();setTimeout(()=>{try{w.focus();w.print()}catch(e){}},600);return}
+    overlay.innerHTML=`<div class="sheet" id="sheetBg"><div class="panel" style="width:min(820px,100%);padding:0"><div class="row head" style="padding:10px 14px"><b>${esc(name.replace(/\.html$/,""))}</b><span class="note">印刷は Ctrl+P（⌘P）</span><button class="btn sm" id="close" style="margin-left:auto">閉じる</button></div><iframe id="slipFrame" style="flex:1;border:0;width:100%;min-height:80vh;background:#fff"></iframe></div></div>`;$("#close").onclick=closeSheet;$("#slipFrame").srcdoc=html};
+  Promise.resolve(text).then(showIn,e=>{try{if(w)w.close()}catch(x){}toast("書類の作成に失敗しました: "+e.message)});return}
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type:"text/plain;charset=utf-8"}));a.download=name;document.body.appendChild(a);a.click();a.remove()}
 function exportCSV(list){downloadText("預かり品一覧_"+today()+".csv",csv([["預かり番号","状態","ゼネコン","現場","所長","品名","数量","単位","面積㎡","棚番","預け主","受入日","出庫日","保管日数","保管料累計","備考"],...list.map(i=>{const s=siteOf(i.siteId)||{};return [i.no,i.status==="out"?"出庫済":"保管中",s.contractor,s.site,i.manager||s.manager||"",i.name,i.qty,i.unit,i.area,i.location,i.person,i.inDate,i.outDate||"",i.inDate?dayDiff(i.inDate,i.outDate||today())+1:0,Math.round(totalFee(i)),i.note]})]))}
-const docCSS=`<meta charset="utf-8"><style>body{font-family:"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif;color:#111;max-width:720px;margin:24px auto;padding:0 20px;font-size:13px}h1{font-size:20px;letter-spacing:.2em;text-align:center;border-bottom:3px solid #1c5fb5;padding-bottom:6px;color:#17243a}.tb{font-size:10px;color:#1c5fb5;letter-spacing:.2em;text-align:right}table{border-collapse:collapse;width:100%;margin:10px 0}th,td{border:1px solid #333;padding:6px 8px;text-align:left}th{background:#efe4bf;font-weight:500;width:28%}.r{text-align:right}.head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px}.sig{display:flex;gap:16px;margin-top:28px}.sig div{flex:1;border:1px solid #333;height:70px;padding:4px;font-size:11px}.ph{display:flex;gap:8px;flex-wrap:wrap}.ph img{width:150px;height:150px;object-fit:cover;border:1px solid #999}.hint{font-size:11px;color:#666;text-align:center;margin-top:20px}@media print{.hint{display:none}}</style>`;
+const docCSS=`<meta charset="utf-8"><style>body{font-family:"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif;color:#111;max-width:720px;margin:24px auto;padding:0 20px;font-size:13px}h1{font-size:20px;letter-spacing:.2em;text-align:center;border-bottom:3px solid #1c5fb5;padding-bottom:6px;color:#17243a}.tb{font-size:10px;color:#1c5fb5;letter-spacing:.2em;text-align:right}table{border-collapse:collapse;width:100%;margin:10px 0}th,td{border:1px solid #333;padding:6px 8px;text-align:left}th{background:#efe4bf;font-weight:500;width:28%}.r{text-align:right}.head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:8px}.sig{display:flex;gap:16px;margin-top:28px}.sig div{flex:1;border:1px solid #333;height:70px;padding:4px;font-size:11px}.ph{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;align-items:flex-start}.ph img{max-width:calc(50% - 4px);max-height:300px;width:auto;height:auto;border:1px solid #999;break-inside:avoid;page-break-inside:avoid}.ph img:only-child{max-width:100%;max-height:380px}.hint{font-size:11px;color:#666;text-align:center;margin-top:20px}@media print{.hint{display:none}}</style>`;
 function companyBlock(){const s=S.settings;return `<div><b>${esc(s.company||"")}</b><br>${esc(s.warehouse||"")}<br>${esc(s.address||"")}${s.tel?"<br>TEL "+esc(s.tel):""}</div>`}
-function slipHTML(it,type){const s=siteOf(it.siteId)||{};const photos=(it.photos||[]).map(p=>`<img src="${thumbSrc(p)}" alt="">`).join("");const out=S.moves.filter(m=>m.itemId===it.id&&m.type==="out");
+async function slipHTML(it,type){const s=siteOf(it.siteId)||{};const srcs=[];for(const p of (it.photos||[])){let src=thumbSrc(p);try{src=await fullPhoto(p.id)}catch(e){}if(src)srcs.push(src)}const photos=srcs.map(src=>`<img src="${src}" alt="">`).join("");const out=S.moves.filter(m=>m.itemId===it.id&&m.type==="out");
   return `<!doctype html><html lang="ja"><head><title>${type==="in"?"預かり証":"出庫伝票"} ${esc(it.no)}</title>${docCSS}</head><body>
   <div class="tb">TEITO BOX</div><h1>${type==="in"?"預 か り 証":"出 庫 伝 票"}</h1>
   <div class="head"><div>${esc(s.contractor||"")} 御中<br>${esc(s.site||"")}${(it.manager||s.manager)?"<br>所長 "+esc(it.manager||s.manager)+" 様":""}${it.person?"<br>担当: "+esc(it.person)+" 様":""}</div>${companyBlock()}</div>
@@ -458,7 +516,7 @@ function invoiceHTML(rows){const [ms,me]=monthRange(billMonth);const st=S.settin
 /* ---------- boot ---------- */
 document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;renderAdmin()});
 (async()=>{
-
+  await migratePhotos();
   PW=sessionStorage.getItem("tb_pw");
   if(PW){try{await rpc("login");canWrite=true;isOwner=true;await reload();return}catch(e){PW=null;sessionStorage.removeItem("tb_pw")}}
   if(location.hash==="#admin"){renderAdminLogin();return}
