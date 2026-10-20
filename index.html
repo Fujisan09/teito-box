@@ -34,6 +34,8 @@ header.top .wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding
 .brand small{color:var(--mute);font-size:12px}
 .badge{display:inline-block;font-size:11px;letter-spacing:.06em;padding:2px 8px;border-radius:999px;background:var(--tint);color:var(--accent);font-weight:500}
 nav.tabs{display:flex;gap:4px;overflow-x:auto;margin-left:auto;scrollbar-width:none}
+#logoutTop{flex:none;white-space:nowrap;margin-left:12px}
+#tabs[hidden]~#logoutTop{margin-left:auto} /* site-user view has no tabs: push the button to the right edge */
 nav.tabs button{border:0;background:transparent;padding:8px 12px;border-radius:6px;white-space:nowrap;cursor:pointer;color:var(--mute);font-weight:500}
 nav.tabs button[aria-selected="true"]{background:var(--tint);color:var(--accent)}
 nav.tabs button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -133,6 +135,8 @@ button,.btn,a,nav.tabs button,tr.rowbtn,.photos img{touch-action:manipulation;-w
   nav.tabs button{padding:7px 9px;font-size:13px}
   header.top{position:static} /* phones: let the header scroll away so the list gets the screen */
   header.top .wrap{padding-block:8px;gap:8px}
+  nav.tabs{order:2}
+  #logoutTop{margin-left:auto}
   .brand{flex:1 1 auto}.brand b{font-size:15px}.brand small{display:none}
   .stats{grid-template-columns:1fr 1fr}
   /* ledgers become cards on phones: photo on the left, labelled fields on the right */
@@ -170,6 +174,7 @@ button,.btn,a,nav.tabs button,tr.rowbtn,.photos img{touch-action:manipulation;-w
     <button data-tab="bill">保管料・請求</button>
     <button data-tab="settings">設定</button>
   </nav>
+  <button class="btn sm" id="logoutTop" hidden>ログアウト</button>
 </div></header>
 
 <main><div class="wrap" id="main">
@@ -269,9 +274,11 @@ function totalFee(it){ // whole stay
 function render(){
   $("#whSub").textContent=DEMO?"お試し版 v4（データはこの端末の中だけに保存されます）":(S.settings.company||"帝都運輸機工")+(S.settings.warehouse?"  "+S.settings.warehouse:"")+"  預かり品 保管管理";
   const badge=$("#modeBadge");
+  $("#logoutTop").hidden=!(canWrite||gateSite);
   if(canWrite){badge.textContent="管理者";$("#tabs").hidden=false;renderAdmin()}
   else{badge.textContent=gateSite?("現場: "+gateSite.site):"現場閲覧";$("#tabs").hidden=true;renderCustomer()}
 }
+function doLogout(){PW=null;sessionStorage.removeItem("tb_pw");lsDel("tb_pw_keep");canWrite=false;isOwner=false;gateSite=null;lsDel("teitobox_gate");S.sites=[];S.items=[];S.moves=[];tab="stock";filter="stored";q="";siteFilter="";closeSheet();render();toast("ログアウトしました")}
 function renderAdmin(){
   document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab));
   ({stock:vStock,in:vIn,moves:vMoves,sites:vSites,map:vMap,bill:vBill,settings:vSettings})[tab]();
@@ -510,7 +517,7 @@ function vSettings(){
   $("#st_save").onclick=async()=>{const d={company:$("#st_company").value.trim(),warehouse:$("#st_wh").value.trim(),address:$("#st_addr").value.trim(),tel:$("#st_tel").value.trim(),rate:+$("#st_rate").value||0,billing:$("#st_bill").value,minMonth:+$("#st_min").value||1,tax:+$("#st_tax").value||0,invoiceNo:$("#st_inv").value.trim(),dueText:$("#st_due").value.trim(),bank:$("#st_bank").value.trim()};await save("settings/main",d);toast("設定を保存しました")};
   $("#bk").onclick=async()=>{try{const d=await rpc("backup");downloadText("TEITO_BOX_backup_"+today()+".json",JSON.stringify(d))}catch(e){toast("取得に失敗")}};
   $("#pw_save").onclick=async()=>{const n=$("#pw_new").value;if(n.length<6){toast("6文字以上にしてください");return}try{await rpc("set_password",{new:n});PW=n;sessionStorage.setItem("tb_pw",n);if(lsGet("tb_pw_keep"))lsSet("tb_pw_keep",n);$("#pw_new").value="";toast("パスワードを変更しました")}catch(e){toast("変更に失敗")}};
-  $("#logoutA").onclick=()=>{PW=null;sessionStorage.removeItem("tb_pw");lsDel("tb_pw_keep");canWrite=false;isOwner=false;render()};
+  $("#logoutA").onclick=doLogout;
 }
 
 /* ---------- item detail ---------- */
@@ -552,7 +559,7 @@ function openItem(id){
 /* Real <form>s with autocomplete names so Safari / Chrome / iCloud Keychain offer to save and refill the
    ID and password; plus "remember on this device" so the next visit needs no typing at all. */
 const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}},lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},lsDel=k=>{try{localStorage.removeItem(k)}catch(e){}};
-function renderAdminLogin(){$("#tabs").hidden=true;const keep=lsGet("tb_pw_keep");main.innerHTML=`<form class="login card" id="a_form" autocomplete="on"><h2>管理者ログイン</h2>
+function renderAdminLogin(){$("#tabs").hidden=true;$("#logoutTop").hidden=true;const keep=lsGet("tb_pw_keep");main.innerHTML=`<form class="login card" id="a_form" autocomplete="on"><h2>管理者ログイン</h2>
   <label class="f">ログインID <input id="a_user" name="username" autocomplete="username" value="admin" autocapitalize="off" spellcheck="false"></label>
   <label class="f">管理者パスワード <input type="password" id="a_pw" name="password" autocomplete="current-password" enterkeyhint="go" value="${esc(keep||"")}"></label>
   <label class="chk"><input type="checkbox" id="a_keep" ${keep||!lsGet("tb_pw_keep_off")?"checked":""}> この端末では次回から自動でログインする</label>
@@ -574,11 +581,10 @@ function renderCustomer(){
   }
   const s=gateSite;const its=S.items.filter(i=>i.siteId===s.id).sort((a,b)=>(a.status==="out")-(b.status==="out")||(b.inDate||"").localeCompare(a.inDate||""));
   const stored=its.filter(i=>i.status!=="out");const area=stored.reduce((a,i)=>a+(+i.area||0),0);
-  main.innerHTML=`<div class="row"><div><h2>${esc(s.contractor)}　${esc(s.site)}</h2><span class="note">預かり品の現状（${fmtD(today())} 時点）</span></div><button class="btn sm" id="logout" style="margin-left:auto">別の現場</button></div>
+  main.innerHTML=`<div class="row"><div><h2>${esc(s.contractor)}　${esc(s.site)}</h2><span class="note">預かり品の現状（${fmtD(today())} 時点）</span></div></div>
   <div class="stats"><div class="stat"><div class="k">保管中</div><div class="v">${stored.length}<small>件</small></div></div><div class="stat"><div class="k">使用面積</div><div class="v">${area.toFixed(1)}<small>㎡</small></div></div><div class="stat"><div class="k">今月保管料（見込）</div><div class="v">${yen(its.reduce((a,i)=>a+feeFor(i,ym()).fee,0))}</div></div></div>
   <div class="tablewrap"><table class="cards"><thead><tr><th>写真</th><th>預かり番号</th><th>状態</th><th>品名</th><th class="num">数量</th><th class="num">面積㎡</th><th>受入日</th><th>出庫日</th><th class="num">保管日数</th></tr></thead><tbody>${its.length?its.map(i=>`<tr class="rowbtn" data-id="${i.id}"><td class="ph">${i.photos&&i.photos[0]?`<img class="thumb" src="${thumbSrc(i.photos[0])}" alt="">`:"—"}</td><td class="code">${esc(i.no)}</td><td>${statusPill(i)}</td><td class="nm">${esc(i.name)}</td><td class="num" data-l="数量">${i.qty} ${esc(i.unit)}</td><td class="num m0">${(+i.area||0).toFixed(1)}</td><td data-l="受入">${fmtD(i.inDate)}</td><td data-l="出庫">${fmtD(i.outDate)||"—"}</td><td class="num" data-l="保管日数">${i.inDate?dayDiff(i.inDate,i.outDate||today())+1:0}</td></tr>`).join(""):`<tr class="nopic"><td colspan="9" class="empty">お預かりしている品はありません。</td></tr>`}</tbody></table></div>
   <div class="note">お問い合わせ: ${esc(S.settings.company||"")} ${S.settings.tel?"TEL "+esc(S.settings.tel):""}</div>`;
-  $("#logout").onclick=()=>{gateSite=null;try{localStorage.removeItem("teitobox_gate")}catch(e){}render()};
   main.querySelectorAll("tr.rowbtn").forEach(tr=>tr.onclick=()=>openItem(tr.dataset.id));
 }
 
@@ -613,6 +619,7 @@ function invoiceHTML(rows){const [ms,me]=monthRange(billMonth);const st=S.settin
   return `<!doctype html><html lang="ja"><head><title>請求書 ${billMonth}</title>${docCSS}<style>.page{page-break-after:always;break-after:page;margin-bottom:40px;border-bottom:1px dashed #999;padding-bottom:20px}.page:last-of-type{page-break-after:auto;border:0}@media print{.page{border:0;margin:0}}</style>${pages}<p class="hint">${rows.length}件の請求書。印刷画面が開かない場合は Ctrl+P（Macは⌘P）を押してください。</p></body></html>`}
 /* ---------- boot ---------- */
 document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{tab=b.dataset.tab;renderAdmin()});
+$("#logoutTop").onclick=()=>{const b=$("#logoutTop");if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="もう一度押すとログアウト";clearTimeout(b._t);b._t=setTimeout(()=>{b.dataset.arm="";b.textContent="ログアウト"},3000);return}clearTimeout(b._t);b.dataset.arm="";b.textContent="ログアウト";doLogout()};
 (async()=>{
   await migratePhotos();await seedSamplePhotos();
   PW=sessionStorage.getItem("tb_pw")||lsGet("tb_pw_keep");
