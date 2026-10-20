@@ -1,0 +1,30 @@
+name: sample photo candidates
+# Collects freely licensed candidate photos for the trial's sample items from Wikimedia Commons
+# and publishes them on the photo-candidates branch (never deployed; main stays untouched).
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/sample-photos.yml"
+      - "tools/sample-photos.json"
+      - "tools/fetch_sample_photos.py"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch candidates from Wikimedia Commons
+        run: python3 tools/fetch_sample_photos.py tools/sample-photos.json /tmp/candidates
+      - name: Publish on the photo-candidates branch
+        run: |
+          set -e
+          cd /tmp/candidates
+          git init -q -b photo-candidates
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "候補写真（Wikimedia Commons, run ${{ github.run_id }}）"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" HEAD:photo-candidates
