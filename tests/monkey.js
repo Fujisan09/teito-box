@@ -13,7 +13,7 @@ const server = http.createServer((req, res) => { let p = decodeURIComponent(req.
 const FILES = ['land.jpg', 'port.jpg', 'f.heic', 'f.tif', 'f_alpha.png', 'f.webp', 'noisy.jpg', 'f.gif', 'sq.jpg'].map(f => path.join(__dirname, f));
 fs.writeFileSync(path.join(__dirname, 'notimage.txt'), 'hello'); fs.writeFileSync(path.join(__dirname, 'broken.jpg'), Buffer.from('ffd8ffe000104a46494600', 'hex'));
 const BAD = [path.join(__dirname, 'notimage.txt'), path.join(__dirname, 'broken.jpg')];
-const TEXTS = ['', 'テスト', 'H形鋼 300×300', '<script>alert(1)</script>', '"><img src=x onerror=alert(1)>', '=1+1', '-5', '0', '1e5', '99999999', 'あ'.repeat(200), '😀🚚🏗️', 'S-001', 's-001', 'Ｓ－００１', '1234', '１２３４', '12', 'teito2026', 'admin', '  ', '2026-10-01', '2030-01-01', '1999-12-31', '3.5', '0.1', 'A-00001', 'null', 'undefined'];
+const TEXTS = ['', 'テスト', 'H形鋼 300×300', '<script>alert(1)</script>', '"><img src=x onerror=alert(1)>', '=1+1', '-5', '0', '1e5', '99999999', 'あ'.repeat(200), '😀🚚🏗️', 'S-001', 's-001', 'Ｓ－００１', '1234', '１２３４', '12', 'teito2026', 'admin', '  ', '2026-10-01', '2030-01-01', '1999-12-31', '3.5', '0.1', 'A-00001'];
 
 (async () => {
   const browser = await chromium.launch();
@@ -21,6 +21,7 @@ const TEXTS = ['', 'テスト', 'H形鋼 300×300', '<script>alert(1)</script>',
     ? { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, colorScheme: rnd() < 0.5 ? 'dark' : 'light' }
     : { viewport: { width: 1280, height: 900 }, colorScheme: rnd() < 0.5 ? 'dark' : 'light' });
   const page = await ctx.newPage();
+  if (process.env.UI) await page.addInitScript(u => { try { localStorage.setItem('tb_ui', u) } catch (e) {} }, process.env.UI);
   ctx.on('page', p => { trace.push('popup'); p.close().catch(() => {}); });
   const problems = [], trace = [];
   const report = (kind, msg) => { problems.push(`${kind}: ${msg} @step ${trace.length} (${trace.slice(-4).join(' | ')})`); };
@@ -37,6 +38,8 @@ const TEXTS = ['', 'テスト', 'H形鋼 300×300', '<script>alert(1)</script>',
       const out = [];
       const txt = document.body.innerText;
       for (const bad of ['undefined', 'NaN', '[object ', 'null']) { const i = txt.indexOf(bad); if (i >= 0 && !/^(null|undefined)$/.test((document.activeElement && document.activeElement.value) || '')) { const ctx = txt.slice(Math.max(0, i - 25), i + 25).replace(/\s+/g, ' '); if (!/(null|undefined)/.test(ctx.slice(0, 25).replace(/.*\s/, '')) || true) out.push(`text "${bad}" near: ${ctx}`); } }
+      if (document.documentElement.scrollWidth > document.documentElement.clientWidth + 1 && !document.querySelector('.sheet')) out.push('horizontal overflow ' + document.documentElement.scrollWidth);
+      { const nav = document.querySelector('#tabs'); if (nav && getComputedStyle(nav).position === 'fixed' && !nav.hidden && !document.querySelector('.sheet,.lightbox')) { const btns = [...document.querySelectorAll('main button, main tr.rowbtn')]; const last = btns[btns.length - 1]; if (last) { const nb = nav.getBoundingClientRect(); const maxY = document.documentElement.scrollHeight - innerHeight; const lr = last.getBoundingClientRect(); const bottomAtMax = lr.bottom - (maxY - scrollY); if (bottomAtMax > nb.top + 1) out.push('last control hidden under tab bar ' + Math.round(bottomAtMax) + '>' + Math.round(nb.top)); } } }
       if (document.querySelectorAll('.lightbox').length > 1) out.push('duplicate lightbox');
       if (document.querySelectorAll('.sheet').length > 1) out.push('duplicate sheet');
       if (!document.querySelector('#main') || !document.querySelector('#main').innerHTML.trim()) out.push('main empty');

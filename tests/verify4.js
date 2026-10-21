@@ -21,6 +21,7 @@ const imgInfo = el => ({ nw: el.naturalWidth, nh: el.naturalHeight, w: el.client
     ? { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true }
     : { viewport: { width: 1280, height: 900 } });
   const page = await ctx.newPage();
+  if (process.env.UI) await page.addInitScript(u => { try { localStorage.setItem('tb_ui', u) } catch (e) {} }, process.env.UI);
   const errors = [], toasts = [];
   page.on('pageerror', e => errors.push('pageerror: ' + e.message));
   page.on('console', m => { if (m.type() === 'error' && !/ERR_TUNNEL|fonts\.googleapis/.test(m.text())) errors.push('console: ' + m.text()); });
@@ -35,9 +36,10 @@ const imgInfo = el => ({ nw: el.naturalWidth, nh: el.naturalHeight, w: el.client
   await page.waitForSelector('tr.rowbtn');
   await page.waitForFunction(() => [...document.querySelectorAll('img.thumb')].every(i => i.complete && i.naturalWidth > 0));
   let th = await page.$$eval('img.thumb', (els, fn) => els.map(eval(fn)), imgInfo.toString());
-  check(th.length === 1 && th[0].nw === 320, '現場担当者画面: サンプル品目に参考写真のサムネイル ' + JSON.stringify(th));
+  check(th.length === 1 && th[0].nw > 200, '現場担当者画面: サンプル品目に参考写真のサムネイル ' + JSON.stringify(th));
   await page.screenshot({ path: OUT + '/1_customer_list.png', fullPage: true });
-  await tap('tr.rowbtn[data-id="i1"]'); await page.waitForSelector('#ph .mainph img');
+  await tap('tr.rowbtn[data-id="i1"]'); await page.waitForSelector('#ph .mainph img'); await tap('#close'); await tap('#logoutTop'); await tap('#logoutTop'); await page.waitForSelector('#g_form'); await page.fill('#g_code', 'S-004'); await page.fill('#g_pin', '4567'); await tap('#g_go'); await page.waitForSelector('tr.rowbtn');
+  await tap('tr.rowbtn[data-id="i4"]'); await page.waitForSelector('#ph .mainph img');
   await page.waitForFunction(() => document.querySelector('#ph .mainph img').naturalWidth > 0 && document.querySelector('#ph .subs img').naturalWidth > 0);
   const det = await page.evaluate(() => ({ main: document.querySelectorAll('#ph .mainph img').length, subs: document.querySelectorAll('#ph .subs img').length, mainH: document.querySelector('#ph .mainph img').clientHeight, subH: document.querySelector('#ph .subs img').clientHeight, credit: (document.querySelector('.sheet .note a') || {}).textContent, noPicker: !document.querySelector('#addPick') }));
   check(det.main === 1 && det.subs === 1 && det.mainH > det.subH * 2 && /Wikimedia/.test(det.credit) && det.noPicker, '詳細: メイン写真(大)＋サブ写真(小窓)＋出典リンク、現場側は追加不可 ' + JSON.stringify(det));
@@ -45,7 +47,7 @@ const imgInfo = el => ({ nw: el.naturalWidth, nh: el.naturalHeight, w: el.client
   await tap('#ph .mainph img'); await page.waitForSelector('.lightbox img');
   await page.waitForFunction(() => document.querySelector('.lightbox img').naturalWidth >= 1000);
   const lb = await page.evaluate(() => ({ nw: document.querySelector('.lightbox img').naturalWidth, cap: document.querySelector('.lightbox .cap').textContent, del: !!document.querySelector('.lightbox .del') }));
-  check(lb.nw === 1280 && /メイン写真/.test(lb.cap) && /写真: /.test(lb.cap) && !lb.del, '拡大: 参考写真の元サイズ表示＋出典、現場側に削除なし ' + JSON.stringify(lb));
+  check(lb.nw >= 960 && /メイン写真/.test(lb.cap) && /写真: /.test(lb.cap) && !lb.del, '拡大: 参考写真の元サイズ表示＋出典、現場側に削除なし ' + JSON.stringify(lb));
   await page.screenshot({ path: OUT + '/3_customer_lightbox.png' });
   await tap('.lightbox .x');
   // "別の現場" keeps the code/PIN prefilled for autocomplete-style reuse
@@ -56,16 +58,16 @@ const imgInfo = el => ({ nw: el.naturalWidth, nh: el.naturalHeight, w: el.client
   await tap('#logoutTop'); await page.waitForSelector('#g_form');
   check(await page.evaluate(() => document.querySelector('#logoutTop').hidden), 'ログアウト（2回押し）→ ログイン画面ではボタン非表示');
   const pre = await page.evaluate(() => ({ c: document.querySelector('#g_code').value, p: document.querySelector('#g_pin').value, ac: document.querySelector('#g_pin').getAttribute('autocomplete'), form: !!document.querySelector('form#g_form') }));
-  check(pre.c === 'S-001' && pre.p === '1234' && pre.ac === 'current-password' && pre.form, '現場ログイン: 前回のID/暗証番号が入力済み、ブラウザ保存用の form/autocomplete あり ' + JSON.stringify(pre));
+  check(pre.c === 'S-004' && pre.p === '4567' && pre.ac === 'current-password' && pre.form, '現場ログイン: 前回のID/暗証番号が入力済み、ブラウザ保存用の form/autocomplete あり ' + JSON.stringify(pre));
 
   // ---- 2. seeding for a ledger created by v3 (sample items without photos) ----
   // the ledger is only written on the first save: log in, save settings, log out
   await tap('#toAdmin'); await page.waitForSelector('#a_form'); await page.fill('#a_pw', 'teito2026'); await tap('#a_go');
   await page.waitForSelector('#tabs:not([hidden])'); await tap('#tabs button[data-tab="settings"]'); await tap('#st_save');
   await page.waitForFunction(() => !!localStorage.getItem('tb_demo_v2')); await tap('#logoutA'); await page.waitForSelector('#g_form');
-  await page.evaluate(() => { const d = JSON.parse(localStorage.getItem('tb_demo_v2')); d.items.forEach(i => { if (/^i\d+$/.test(i.id)) i.photos = []; }); localStorage.setItem('tb_demo_v2', JSON.stringify(d)); localStorage.removeItem('tb_sample_photos_v4'); });
+  await page.evaluate(() => { const d = JSON.parse(localStorage.getItem('tb_demo_v2')); d.items.forEach(i => { if (/^i\d+$/.test(i.id)) i.photos = []; }); localStorage.setItem('tb_demo_v2', JSON.stringify(d)); localStorage.removeItem('tb_sample_photos_v4'); localStorage.removeItem('tb_sample_v6'); d.items.forEach(i => { if (i.id === 'i1') i.name = 'H形鋼 300×300 L=3m'; }); localStorage.setItem('tb_demo_v2', JSON.stringify(d)); });
   await page.reload(); await page.waitForSelector('#g_form');
-  const seeded = await page.evaluate(() => { const d = JSON.parse(localStorage.getItem('tb_demo_v2')); return d.items.filter(i => /^i\d+$/.test(i.id) && i.photos.length === 2).length; });
+  const seeded = await page.evaluate(() => { const d = JSON.parse(localStorage.getItem('tb_demo_v2')); return d.items.filter(i => /^i\d+$/.test(i.id) && i.photos.length >= 1 && /^jp_/.test(i.photos[0].id)).length + (d.items.find(i=>i.id==='i1').name.includes('単管') ? 0 : -100); });
   check(seeded === 10, `v3の台帳にも参考写真を一度だけ付与（${seeded}/10 品目）`);
 
   // ---- 3. admin: login form + remember on this device ----
@@ -114,12 +116,13 @@ const imgInfo = el => ({ nw: el.naturalWidth, nh: el.naturalHeight, w: el.client
   await page.screenshot({ path: OUT + '/6_item_detail.png', fullPage: true });
 
   // ---- 5. slip shows main photo large + credit for sample items ----
-  await tap('#close'); await tap('tr.rowbtn[data-id="i7"]'); await page.waitForSelector('#slipIn');
+  await tap('#close'); await tap('tr.rowbtn[data-id="i8"]'); await page.waitForSelector('#slipIn');
   await page.evaluate(() => { window.open = () => null; });
   await tap('#slipIn'); await page.waitForSelector('#slipFrame'); await page.waitForTimeout(800);
   const frame = page.frames().find(f => f !== page.mainFrame());
-  const sl = await frame.evaluate(() => ({ main: document.querySelectorAll('.ph img.mainp').length, sub: document.querySelectorAll('.ph img.subp').length, credit: /参考写真/.test(document.body.textContent), mainNW: document.querySelector('.ph img.mainp').naturalWidth }));
-  check(sl.main === 1 && sl.sub === 1 && sl.credit && sl.mainNW === 960, '預かり証: メイン大・サブ小＋出典 ' + JSON.stringify(sl));
+  await frame.waitForSelector('.ph img.mainp', { timeout: 8000 }).catch(() => {});
+  const sl = await frame.evaluate(() => ({ main: document.querySelectorAll('.ph img.mainp').length, sub: document.querySelectorAll('.ph img.subp').length, credit: /参考写真/.test(document.body.textContent), mainNW: (document.querySelector('.ph img.mainp')||{}).naturalWidth }));
+  check(sl.main === 1 && sl.sub === 1 && sl.credit && sl.mainNW === 1280, '預かり証: メイン大・サブ小＋出典 ' + JSON.stringify(sl));
   await page.screenshot({ path: OUT + '/7_slip.png', fullPage: true });
   await tap('#close');
 

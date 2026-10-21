@@ -8,3 +8,5 @@ Claude のサンドボックスで使っているテスト一式。`node tests/<
 - `monkey.js` … ランダム操作（クリック／入力／アップロード／キー／再読み込み／戻る）。`node tests/monkey.js <repo> <desktop|mobile> <回数> <seed>`
   ページエラー・コンソールエラー・「エラー:」トースト・画面上の undefined/NaN・台帳の破損・重複オーバーレイを検出
 - `shots.js` … 全画面をライト/ダーク × PC/スマホで撮影（目視確認用）
+- `shots_ui.js` … 画面デザイン A / B の全画面撮影（`node tests/shots_ui.js a`）
+- 画面デザインを指定して実行: `UI=a node tests/verify5.js …`（std / a / b）

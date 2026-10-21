@@ -1,15 +1,12 @@
-{
-  "comment": "候補（photo-candidates ブランチの各実行）から選んだ写真。各品目の1枚目がメイン写真。",
-  "items": {
-    "i1":  [{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand3","key":"i1","n":1},  {"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand2","key":"i1","n":3}],
-    "i2":  [{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand2","key":"i2","n":3},  {"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand2","key":"i2","n":8}],
-    "i3":  [{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand2","key":"i3","n":9},  {"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand2","key":"i3","n":2}],
-    "i4":  [{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand2","key":"i4","n":5},  {"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand2","key":"i4","n":3}],
-    "i5":  [{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand3","key":"i5","n":8},  {"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand3","key":"i5","n":7}],
-    "i6":  [{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand2","key":"i6","n":1},  {"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand2","key":"i6","n":9}],
-    "i7":  [{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand2","key":"i7","n":1},  {"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand","key":"i7","n":8}],
-    "i8":  [{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand2","key":"i8","n":1},  {"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand2","key":"i8","n":9}],
-    "i9":  [{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand2","key":"i9","n":4},  {"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand2","key":"i5","n":2}],
-    "i10": [{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand2","key":"i10","n":2}, {"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand2","key":"i10","n":6}]
-  }
-}
+{"comment":"日本で撮影された Wikimedia Commons の写真から選定。品名は写真に写っている物に合わせる。1枚目がメイン。",
+ "items":{
+  "i1":[{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/candjp","key":"i5","n":1}],
+  "i2":[{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/candjp","key":"i6","n":10},{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/candjp","key":"i6","n":12}],
+  "i3":[{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/candjp","key":"i3","n":6},{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/candjp","key":"i3","n":8}],
+  "i4":[{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/candjp","key":"i4","n":9},{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/candjp","key":"i4","n":10}],
+  "i5":[{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/candjp","key":"i9","n":2}],
+  "i6":[{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/candjp","key":"i6","n":11}],
+  "i7":[{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand2","key":"i7","n":1}],
+  "i8":[{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand2","key":"i8","n":1},{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/cand2","key":"i8","n":9}],
+  "i9":[{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/candjp","key":"i9","n":8},{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/candjp","key":"i9","n":1}],
+  "i10":[{"dir":"/tmp/claude-0/-home-claude/1a83a4f9-7010-5e10-91c4-73b47c9d0af3/scratchpad/candjp","key":"i7","n":2}]}}

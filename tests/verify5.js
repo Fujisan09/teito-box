@@ -18,6 +18,7 @@ const check = (cond, msg) => { console.log((cond ? 'PASS ' : 'FAIL ') + msg); if
     : { viewport: { width: 1280, height: 900 } });
   await ctx.grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => {});
   const page = await ctx.newPage();
+  if (process.env.UI) await page.addInitScript(u => { try { localStorage.setItem('tb_ui', u) } catch (e) {} }, process.env.UI);
   const errors = [], toasts = [], dialogs = [];
   let dialogAction = 'accept';
   page.on('pageerror', e => errors.push('pageerror: ' + e.message));
@@ -34,7 +35,7 @@ const check = (cond, msg) => { console.log((cond ? 'PASS ' : 'FAIL ') + msg); if
   await page.goto(base + '?site=%EF%BD%93-001&pin=%EF%BC%91%EF%BC%92%EF%BC%93%EF%BC%94'); // full-width "ｓ-001" / "１２３４"
   await page.waitForSelector('tr.rowbtn');
   check(/S-001|北千住/.test(await page.textContent('#modeBadge')) && !/pin=/.test(page.url()), '案内リンク（全角コード/暗証番号）で現場画面が開き、URLから暗証番号が消える: ' + page.url());
-  check(await page.$eval('.brand small .ver', e => /お試し版 v5/.test(e.textContent) && getComputedStyle(e).display !== 'none'), 'バージョン表記 v5 が表示（スマホでも）');
+  check(await page.$eval('.brand small .ver', e => /お試し版 v6/.test(e.textContent) && getComputedStyle(e).display !== 'none'), 'バージョン表記 v6 が表示（スマホでも）');
   // Back-button layers: item sheet → photo → Back closes photo → Back closes sheet
   await tap('tr.rowbtn[data-id="i1"]'); await page.waitForSelector('#ph .mainph img');
   await tap('#ph .mainph img'); await page.waitForSelector('.lightbox');
@@ -80,7 +81,7 @@ const check = (cond, msg) => { console.log((cond ? 'PASS ' : 'FAIL ') + msg); if
 
   // ---- 3. search keeps the keyboard/focus; count shown ----
   await tap('#tabs button[data-tab="stock"]'); await page.waitForSelector('#q');
-  await page.focus('#q'); await page.keyboard.type('H形鋼');
+  await page.focus('#q'); await page.keyboard.type('単管');
   const sr = await page.evaluate(() => ({ focused: document.activeElement && document.activeElement.id === 'q', rows: document.querySelectorAll('tr.rowbtn').length, count: document.querySelector('#stockCount').textContent }));
   check(sr.focused && sr.rows === 1 && sr.count === '1件', '検索: 入力欄のフォーカスを保ったまま絞り込み、件数表示 ' + JSON.stringify(sr));
   await page.fill('#q', '');
